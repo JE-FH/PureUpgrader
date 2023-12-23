@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PureUpgrader": {
+      "commandName": "Project",
+      "commandLineArgs": "list-upgraders"
+    }
+  }
+}
