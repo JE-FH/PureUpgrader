@@ -36,6 +36,7 @@ namespace PureUpgrader.Services.impl
 				};
 
 				_connection = new NpgsqlConnection(builder.ToString());
+				await _connection.OpenAsync();
 			}
 
 			return _connection;

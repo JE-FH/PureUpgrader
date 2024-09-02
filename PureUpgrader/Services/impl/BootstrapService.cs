@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,8 +22,6 @@ namespace PureUpgrader.Services.impl
 		IConnectionFactory _connectionFactory
 		) : IBootstrapService
 	{
-		private const string UpgraderUsername = "pu_upgrader_user";
-
 		public async Task Bootstrap(bool allowOverwrite, string upgraderUsername, string dbHost, string dbName, string dbUser, string dbPassword)
 		{
 			await HandleOldConfigIfExists();
@@ -41,14 +40,16 @@ namespace PureUpgrader.Services.impl
 			{
 				DbHost = dbHost,
 				DbName = dbName,
-				DbUser = UpgraderUsername,
+				DbUser = upgraderUsername,
 				DbPassword = await CreateUser(suConnection, upgraderUsername)
 			});
+
+			await CreateDatabase(suConnection, dbName, upgraderUsername);
 
 			await CreateHistoryTables();
 
 			await suConnection.CloseAsync();
-        }
+		}
 
 		private async Task CreateHistoryTables() {
 			NpgsqlConnection connection = await _connectionFactory.GetConnection();
@@ -57,7 +58,7 @@ namespace PureUpgrader.Services.impl
 				CREATE TABLE pu_upgrader_log (
 					id SERIAL PRIMARY KEY,
 					upgrader_name TEXT NOT NULL,
-					completed_date DATETIME NOT NULL
+					completed_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 				)
 				""");
 		}
@@ -73,33 +74,39 @@ namespace PureUpgrader.Services.impl
 		{
 			int count = await adminConnection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM pg_roles WHERE rolname=@UpgraderUsername", new
 			{
-				UpgraderUsername
+				upgraderUsername
 			});
 			if (count != 0)
 			{
-				throw new UpgraderUserAlreadyExistsException(UpgraderUsername, "Upgrader user already exists");
+				throw new UpgraderUserAlreadyExistsException(upgraderUsername, "Upgrader user already exists");
 			}
 
+			//The generated pasword is not allowed to contain ' since it would break the creation command
 			string generatedPassword = Convert.ToHexString(RandomNumberGenerator.GetBytes(8));
 			
 			var commandBuilder = new NpgsqlCommandBuilder();
-			await adminConnection.ExecuteAsync($"""
-				CREATE DATABASE
-					OWNER {commandBuilder.QuoteIdentifier(UpgraderUsername)};
-				""");
 
 			await adminConnection.ExecuteAsync($"""
-				CREATE ROLE {commandBuilder.QuoteIdentifier(UpgraderUsername)}
+				CREATE ROLE {commandBuilder.QuoteIdentifier(upgraderUsername)}
 					CREATEROLE
 					LOGIN
-					PASSWORD @Password;
+					PASSWORD '{generatedPassword}';
 				""", new
 			{
-				UpgraderUsername,
+				upgraderUsername,
 				Password = generatedPassword
 			});
 
 			return generatedPassword;
+		}
+
+		private static async Task CreateDatabase(NpgsqlConnection suConn, string dbName, string upgraderUsername)
+		{
+			var commandBuilder = new NpgsqlCommandBuilder();
+			await suConn.ExecuteAsync($"""
+				CREATE DATABASE {commandBuilder.QuoteIdentifier(dbName)}
+					OWNER {commandBuilder.QuoteIdentifier(upgraderUsername)};
+				""");
 		}
 	}
 }

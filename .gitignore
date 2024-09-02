@@ -482,3 +482,5 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+examples/simple/.pu-log.txt
+examples/simple/.pure-upgrader.config.json

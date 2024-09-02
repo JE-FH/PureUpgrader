@@ -10,9 +10,9 @@ using PureUpgrader.Repositories.Impl;
 namespace PureUpgrader.Repositories.Impl
 {
 	internal class UpgraderRepository(
-        IUpgraderLoaderRepository _upgraderLoaderRepository,
-        ILogger<UpgraderRepository> _logger
-    ) : IUpgraderRepository
+		IUpgraderLoaderRepository _upgraderLoaderRepository,
+		ILogger<UpgraderRepository> _logger
+	) : IUpgraderRepository
 	{
 		private static readonly string s_upgraderFolder = "./";
 		private List<IUpgrader>? _loadedUpgraders;
@@ -21,6 +21,12 @@ namespace PureUpgrader.Repositories.Impl
 		{
 			_loadedUpgraders ??= (await LoadUpgraders()).ToList();
 			return _loadedUpgraders;
+		}
+
+		public async Task<IUpgrader?> GetUpgrader(string name)
+		{
+			_loadedUpgraders ??= (await LoadUpgraders()).ToList();
+			return _loadedUpgraders.FirstOrDefault(upgrader => upgrader.Name == name);
 		}
 
 		private async Task<IEnumerable<IUpgrader>> LoadUpgraders()

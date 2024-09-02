@@ -55,7 +55,7 @@ namespace PureUpgrader.Loaders
 			return new SimpleUpgrader(upgraderCommand, downgraderCommand, name, dependency);
 		}
 
-		[GeneratedRegex(@"^--(?<name>[\.a-zA-Z0-9]+)\s+AFTER\s+(?<dependency>[\.a-zA-Z0-9]+)\s*")]
+		[GeneratedRegex(@"^--\s+(?<name>[\.a-zA-Z0-9]+)\s+AFTER\s+(?<dependency>[\.a-zA-Z0-9]+)\s*")]
 		private static partial Regex DefinitionLineRx();
 	}
 }
