@@ -15,6 +15,6 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
       - name: Pack nuget package
-        run: dotnet pack --configuration Release /p:Version=${{ github.ref }} --no-build --output .
+        run: dotnet pack --configuration Release /p:Version=${{ github.ref_name }} --no-build --output .
       - name: Publish to nuget
         run: dotnet nuget push PureUpgrader.${{ github.ref_name }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
