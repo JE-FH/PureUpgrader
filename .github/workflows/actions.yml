@@ -13,7 +13,7 @@ jobs:
           dotnet-version: 8.x
       - uses: actions/checkout@v4
       - name: Build
-        run: dotnet build
+        run: dotnet build --configuration Release
       - name: Pack nuget package
         run: dotnet pack --configuration Release /p:Version=${{ github.ref }} --no-build --output .
       - name: Publish to nuget
