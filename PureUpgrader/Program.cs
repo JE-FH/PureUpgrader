@@ -63,7 +63,7 @@ class Worker(
 	IUpgraderRepository _upgraderRepository,
 	ICLIService _cliService,
 	ILogger<Worker> _logger,
-	IApplicationLifetime _applicationLifetime
+	IHostApplicationLifetime _applicationLifetime
 	) : IHostedService
 {
 	private int _exitCode = 1;
@@ -186,7 +186,7 @@ class Worker(
 		}
 		catch (InvalidUpgradePathException e)
 		{
-			Console.Error.WriteLine($"Invalid upgrade path. From: {e.From}, target upgrader: {e.To.Name}");
+			Console.Error.WriteLine($"Invalid upgrade path. From: {e.From}, target upgrader: {e.To?.Name}");
 			_logger.LogError(e, "Invalid upgrade path while  trying to upgrade");
 			return 1;
 		}
