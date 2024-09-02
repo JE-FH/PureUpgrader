@@ -10,5 +10,6 @@ namespace PureUpgrader.Repositories
 	public interface IUpgraderRepository
 	{
 		public Task<IEnumerable<IUpgrader>> GetUpgraders();
+		public Task<IUpgrader?> GetUpgrader(string name);
 	}
 }

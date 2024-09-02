@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Npgsql;
 using PureUpgrader.Extensions;
@@ -37,7 +38,10 @@ namespace PureUpgrader.Upgraders
 		private string ReplaceTemplates(NpgsqlConnection connection, string command)
 		{
 			var commandBuilder = new NpgsqlCommandBuilder();
-			return command.Replace("{{TARGET_DB}}", commandBuilder.QuoteIdentifier(connection.Database));
+			var dbPrefixRegex = new Regex("{{DB_PREFIX:([^}]+)}}");
+			
+			return dbPrefixRegex.Replace(command, m => commandBuilder.QuoteIdentifier(connection.Database + m.Groups[1].Value))
+				.Replace("{{TARGET_DB}}", commandBuilder.QuoteIdentifier(connection.Database));
 		}
 	}
 }

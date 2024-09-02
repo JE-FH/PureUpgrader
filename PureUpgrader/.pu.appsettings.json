@@ -1,0 +1,16 @@
+{
+	"Logging": {
+		"LogLevel": {
+			"Default": "Information",
+			"System": "Information",
+			"Microsoft": "Error"
+		},
+		"File": {
+			"Path": ".pu-log.txt",
+			"Append": true,
+			"MinLevel": "Information",
+			"FileSizeLimitBytes": 0,
+			"MaxRollingFiles": 0
+		}
+	}
+}
