@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "PureUpgrader": {
-      "commandName": "Project",
-      "commandLineArgs": "upgrade NONE --dry-run",
-      "workingDirectory": "C:\\Users\\jense\\Development\\PureUpgrader\\examples\\simple"
-    }
-  }
-}
